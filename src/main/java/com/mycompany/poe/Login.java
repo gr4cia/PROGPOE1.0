@@ -1,79 +1,72 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.poe;
 
-/**
- *
- * @author Student
- */
-class Login {
+public class Login {
     private String username;
     private String password;
-    private String cellNumber;
+    private String cell;
     private String firstName;
     private String lastName;
+
+    public Login() {}
 
     public boolean checkUserName(String username) {
         return username.contains("_") && username.length() <= 5;
     }
 
     public boolean checkPasswordComplexity(String password) {
-        if (password.length() < 8) return false;
-        
-        boolean hasCapital = false;
-        boolean hasNumber = false;
-        boolean hasSpecial = false;
-        String specialChars = "!@#$%^&*()-+";
-
-        for (char c : password.toCharArray()) {
-            if (Character.isUpperCase(c)) hasCapital = true;
-            if (Character.isDigit(c)) hasNumber = true;
-            if (specialChars.contains(String.valueOf(c))) hasSpecial = true;
-        }
-        return hasCapital && hasNumber && hasSpecial;
+        boolean hasUpper = !password.equals(password.toLowerCase());
+        boolean hasNumber = password.matches(".*\\d.*");
+        boolean hasSpecial = password.matches(".*[^a-zA-Z0-9].*");
+        return password.length() >= 8 && hasUpper && hasNumber && hasSpecial;
     }
 
     public boolean checkCellPhoneNumber(String cell) {
-        return cell.startsWith("+27") && cell.length() == 12 && cell.substring(3).matches("\\d{9}");
+        return cell.matches("^\\+27\\d{9}$");
     }
 
-    public String registerUser(String username, String password, String cell) {
-        String message = "";
-        if (!checkUserName(username)) {
-            message += "Username is not correctly formatted, please ensure that your username contains an underscore and is no more than five characters in length.\n";
+    public String getUsernameCaptureMessage(String username) {
+        if (checkUserName(username)) {
+            return "Username successfully captured.";
         } else {
-            message += "Username successfully captured.\n";
+            return "Username is not correctly formatted, please ensure that your username contains an underscore and is no more than 5 characters in length.";
         }
+    }
 
-        if (!checkPasswordComplexity(password)) {
-            message += "Password is not correctly formatted, please ensure that the password contains at least eight characters, a capital letter, a number and a special character.\n";
+    public String getPasswordCaptureMessage(String password) {
+        if (checkPasswordComplexity(password)) {
+            return "Password successfully captured.";
         } else {
-            message += "Password successfully captured.\n";
+            return "Password is not correctly formatted, please ensure that the password contains at least 8 characters, a capital letter, a number and a special character.";
         }
+    }
 
-        if (!checkCellPhoneNumber(cell)) {
-            message += "Cell phone number incorrectly formatted or does not contain international code.";
+    public String getCellPhoneCaptureMessage(String cell) {
+        if (checkCellPhoneNumber(cell)) {
+            return "Cell number successfully captured.";
         } else {
-            message += "Cell phone number successfully added.";
-            this.username = username;
-            this.password = password;
-            this.cellNumber = cell;
+            return "Cell number is incorrectly formatted or does not contain an international code, please correct the number.";
         }
-        return message;
+    }
+
+    // This is what your PoeTest.java needs - 5 parameters
+    public void registerUser(String username, String password, String cell, String firstName, String lastName) {
+        this.username = username;
+        this.password = password;
+        this.cell = cell;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public boolean loginUser(String username, String password) {
-        return username.equals(this.username) && password.equals(this.password);
+        if (this.username == null || this.password == null) return false;
+        return this.username.equals(username) && this.password.equals(password);
     }
 
-    public String returnLoginStatus(String username, String password, String firstName, String lastName) {
+    public String returnLoginStatus(String username, String password) {
         if (loginUser(username, password)) {
-            return "Welcome " + firstName + ", " + lastName + " it is great to see you again.";
+            return "Welcome " + firstName + " " + lastName + ", it is great to see you again.";
         } else {
             return "Username or password incorrect, please try again.";
         }
     }
-}   
-
+}

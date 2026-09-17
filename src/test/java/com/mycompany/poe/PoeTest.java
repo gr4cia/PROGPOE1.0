@@ -22,7 +22,8 @@ public class PoeTest {
     @Test
     void testUsernameIncorrectlyFormatted() {
         assertFalse(system.checkUserName("sipho!!!!"));
-        assertEquals("Username is not correctly formatted, please ensure that your username contains an underscore and is no more than 5 characters in length.", system.getUsernameCaptureMessage("sipho!!!!"));
+        assertEquals("Username is not correctly formatted, please ensure that your username "
+                + "contains an underscore and is no more than 5 characters in length.", system.getUsernameCaptureMessage("sipho!!!!"));
     }
 
     @Test
@@ -34,7 +35,8 @@ public class PoeTest {
     @Test
     void testPasswordIncorrectlyFormatted() {
         assertFalse(system.checkPasswordComplexity("weakpass"));
-        assertEquals("Password is not correctly formatted, please ensure that the password contains at least 8 characters, a capital letter, a number and a special character.", system.getPasswordCaptureMessage("weakpass"));
+        assertEquals("Password is not correctly formatted, please ensure that the password contains at least"
+                + " 8 characters, a capital letter, a number and a special character.", system.getPasswordCaptureMessage("weakpass"));
     }
 
     @Test
@@ -47,7 +49,8 @@ public class PoeTest {
     void testCellPhoneIncorrectlyFormatted_BriefData() {
         assertFalse(system.checkCellPhoneNumber("08966553"));
         assertFalse(system.checkCellPhoneNumber("0834567890"));
-        assertEquals("Cell number is incorrectly formatted or does not contain an international code, please correct the number.", system.getCellPhoneCaptureMessage("08966553"));
+        assertEquals("Cell number is incorrectly formatted or does not contain an international code, please correct the number.",
+                system.getCellPhoneCaptureMessage("08966553"));
     }
 
     // ========== LOGIN TESTS ==========

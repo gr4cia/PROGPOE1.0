@@ -28,7 +28,8 @@ public class Login {
         if (checkUserName(username)) {
             return "Username successfully captured.";
         } else {
-            return "Username is not correctly formatted, please ensure that your username contains an underscore and is no more than 5 characters in length.";
+            return "Username is not correctly formatted, please ensure that your username contains an underscore"
+                    + " and is no more than 5 characters in length.";
         }
     }
 
@@ -36,7 +37,8 @@ public class Login {
         if (checkPasswordComplexity(password)) {
             return "Password successfully captured.";
         } else {
-            return "Password is not correctly formatted, please ensure that the password contains at least 8 characters, a capital letter, a number and a special character.";
+            return "Password is not correctly formatted, please ensure that the"
+                    + " password contains at least 8 characters, a capital letter, a number and a special character.";
         }
     }
 
@@ -48,7 +50,7 @@ public class Login {
         }
     }
 
-    // This is what your PoeTest.java needs - 5 parameters
+    
     public void registerUser(String username, String password, String cell, String firstName, String lastName) {
         this.username = username;
         this.password = password;

@@ -110,6 +110,19 @@ public class message {
         return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
      }
 }
-
+  public String SentMessage(String choice) {
+        String c = choice.toLowerCase();
+        if (c.equals("1") || c.contains("send")) {
+            String status = "Sent";
+            return "Message successfully sent.";
+        } else if (c.equals("2") || c.contains("disregard") || c.contains("discard") || c.equals("0")) {
+            String status = "Disregarded";
+            return "Press 0 to delete the message.";
+        } else if (c.equals("3") || c.contains("store")) {
+            String status = "Stored";
+            return "Message successfully stored.";
+        }
+        return "Invalid option.";
+    }
 
 

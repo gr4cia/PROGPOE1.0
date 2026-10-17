@@ -191,4 +191,6 @@ public class message {
             System.out.println("Error storing: " + e.getMessage());
         }
     }
+      public String getMessageID() { return messageID; }
+    public String getMessageHash() { return messageHash; }
 }

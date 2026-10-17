@@ -156,5 +156,39 @@ public class message {
     public static int getTotalMessagesStatic() {
         return totalSent;
     }
-    
+     public void storeMessage() {
+        String fileName = "messages.json";
+        String existing = "[]";
+        try {
+            if (Files.exists(Paths.get(fileName))) {
+                existing = new String(Files.readAllBytes(Paths.get(fileName)));
+                if (existing.trim().isEmpty()) existing = "[]";
+            }
+        } catch (IOException e) {
+            existing = "[]";
+        }
+
+        String safeMsg = message.replace("\"", "'");
+        String jsonObj = "{\"MessageID\":\"" + messageID + "\",\"MessageNumber\":" + messageNumber + ",\"MessageHash\":\"" + messageHash + "\",\"Recipient\":\"" + recipient + "\",\"Message\":\"" + safeMsg + "\"}";
+
+        String newContent;
+        if (existing.trim().equals("[]")) {
+            newContent = "[" + jsonObj + "]";
+        } else {
+            newContent = existing.trim();
+            if (newContent.endsWith("]")) {
+                newContent = newContent.substring(0, newContent.length() - 1);
+                if (!newContent.trim().endsWith("[")) newContent += ",";
+                newContent += jsonObj + "]";
+            } else {
+                newContent = "[" + jsonObj + "]";
+            }
+        }
+
+        try (FileWriter file = new FileWriter(fileName)) {
+            file.write(newContent);
+        } catch (IOException e) {
+            System.out.println("Error storing: " + e.getMessage());
+        }
+    }
 }

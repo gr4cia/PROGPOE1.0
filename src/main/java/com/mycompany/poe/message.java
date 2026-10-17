@@ -97,6 +97,19 @@ public class message {
         } else {
             firstWord = des.substring(0, firstSpace);
         }
-    
-  
+     String lastWord;
+        int lastSpace = des.lastIndexOf(" ");
+        if (lastSpace == -1) {
+            lastWord = des;
+        } else {
+            lastWord = des.substring(lastSpace + 1);
+        }
+         firstWord = firstWord.replaceAll("[^a-zA-Z0-9]", "");
+        lastWord = lastWord.replaceAll("[^a-zA-Z0-9]", "");
+
+        return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
+     }
+}
+
+
 

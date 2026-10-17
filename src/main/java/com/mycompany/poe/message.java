@@ -109,7 +109,7 @@ public class message {
 
         return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
      }
-}
+
   public String SentMessage(String choice) {
         String c = choice.toLowerCase();
         if (c.equals("1") || c.contains("send")) {
@@ -125,4 +125,36 @@ public class message {
         return "Invalid option.";
     }
 
+   public void recordMessage() {
+        totalCaptured = totalCaptured + 1;
+        if (status.equals("Sent")) {
+            totalSent = totalSent + 1;
+            sentReport = sentReport + getFullDetails() + "\n----------------\n";
+        }
+        if (status.equals("Sent") || status.equals("Stored")) {
+            storeMessage();
+        }
+    }
+ public String getFullDetails() {
+        return "MessageID: " + messageID +
+               "\nMessageHash: " + messageHash +
+               "\nRecipient: " + recipient +
+               "\nMessage: " + message;
+    }
 
+    public static String printMessagesStatic() {
+        if (sentReport.equals("")) {
+            return "No messages sent.";
+        }
+        return sentReport;
+    }
+
+    public int returnTotalMessages() {
+        return totalSent;
+    }
+
+    public static int getTotalMessagesStatic() {
+        return totalSent;
+    }
+    
+}

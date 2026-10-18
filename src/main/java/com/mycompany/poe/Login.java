@@ -36,8 +36,7 @@ public class Login {
         if (checkUserName(username)) {
             return "Username successfully captured.";
         } else {
-            return "Username is not correctly formatted, please ensure that your username contains an underscore"
-                    + " and is no more than 5 characters in length.";
+            return "Username is not correctly formatted, please ensure that your username contains an underscore and is no more than 5 characters in length.";
         }
     }
 
@@ -45,8 +44,7 @@ public class Login {
         if (checkPasswordComplexity(password)) {
             return "Password successfully captured.";
         } else {
-            return "Password is not correctly formatted, please ensure that the"
-                    + " password contains at least 8 characters, a capital letter, a number and a special character.";
+            return "Password is not correctly formatted, please ensure that the password contains at least 8 characters, a capital letter, a number and a special character.";
         }
     }
 
@@ -58,13 +56,29 @@ public class Login {
         }
     }
 
-    
-    public void registerUser(String username, String password, String cell, String firstName, String lastName) {
+    // THIS IS THE FIX - NOW RETURNS STRING
+    public String registerUser(String username, String password, String cell, String firstName, String lastName) {
+        String userMsg = getUsernameCaptureMessage(username);
+        String passMsg = getPasswordCaptureMessage(password);
+        String cellMsg = getCellPhoneCaptureMessage(cell);
+
+        if (!checkUserName(username)) {
+            return userMsg;
+        }
+        if (!checkPasswordComplexity(password)) {
+            return passMsg;
+        }
+        if (!checkCellPhoneNumber(cell)) {
+            return cellMsg;
+        }
+
         this.username = username;
         this.password = password;
         this.cell = cell;
         this.firstName = firstName;
         this.lastName = lastName;
+        
+        return "User registered successfully.";
     }
 
     public boolean loginUser(String username, String password) {

@@ -56,7 +56,7 @@ public class Login {
         }
     }
 
-    // THIS IS THE FIX - NOW RETURNS STRING
+  
     public String registerUser(String username, String password, String cell, String firstName, String lastName) {
         String userMsg = getUsernameCaptureMessage(username);
         String passMsg = getPasswordCaptureMessage(password);

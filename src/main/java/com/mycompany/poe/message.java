@@ -21,7 +21,7 @@ public class message {
     private String messageHash;
     private String status;
     
-      private static int totalCaptured = 0;
+    private static int totalCaptured = 0;
     private static int totalSent = 0;
     private static String sentReport = "";
 
@@ -50,7 +50,8 @@ public class message {
     public String getGeneratedIDMessage() {
         return "Message ID generated: " + messageID;
     }
-   public String checkRecipientCell() {
+    
+    public String checkRecipientCell() {
         if (recipient == null) {
             return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
         }
@@ -64,7 +65,8 @@ public class message {
     public boolean isRecipientValid() {
         return checkRecipientCell().equals("Cell phone number successfully captured.");
     }
-   public String checkMessageLength() {
+    
+    public String checkMessageLength() {
         if (message.length() <= 250) {
             return "Message ready to send.";
         } else {
@@ -73,22 +75,16 @@ public class message {
         }
     }
 
-    public String checkMessageLengthTest() {
-        return checkMessageLength();
-    }
-
     public boolean isMessageLengthValid() {
         return message.length() <= 250;
     }
-     public String createMessageHash() {
+    
+    public String createMessageHash() {
         String firstTwo = messageID.substring(0, 2);
         if (message == null || message.trim().isEmpty()) {
             return (firstTwo + ":" + messageNumber + ":EMPTY").toUpperCase();
         }
-
         String des = message.trim();
-
-       
         String firstWord;
         int firstSpace = des.indexOf(" ");
         if (firstSpace == -1) {
@@ -96,45 +92,46 @@ public class message {
         } else {
             firstWord = des.substring(0, firstSpace);
         }
-     String lastWord;
+        String lastWord;
         int lastSpace = des.lastIndexOf(" ");
         if (lastSpace == -1) {
             lastWord = des;
         } else {
             lastWord = des.substring(lastSpace + 1);
         }
-         firstWord = firstWord.replaceAll("[^a-zA-Z0-9]", "");
+        firstWord = firstWord.replaceAll("[^a-zA-Z0-9]", "");
         lastWord = lastWord.replaceAll("[^a-zA-Z0-9]", "");
-
         return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
-     }
+    }
 
-  public String SentMessage(String choice) {
+    
+    public String SentMessage(String choice) {
         String c = choice.toLowerCase();
         if (c.equals("1") || c.contains("send")) {
-            String status = "Sent";
+            this.status = "Sent"; 
             return "Message successfully sent.";
         } else if (c.equals("2") || c.contains("disregard") || c.contains("discard") || c.equals("0")) {
-            String status = "Disregarded";
+            this.status = "Disregarded";
             return "Press 0 to delete the message.";
         } else if (c.equals("3") || c.contains("store")) {
-            String status = "Stored";
+            this.status = "Stored"; 
             return "Message successfully stored.";
         }
         return "Invalid option.";
     }
 
-   public void recordMessage() {
+    public void recordMessage() {
         totalCaptured = totalCaptured + 1;
-        if (status.equals("Sent")) {
+        if (this.status.equals("Sent")) {
             totalSent = totalSent + 1;
             sentReport = sentReport + getFullDetails() + "\n----------------\n";
         }
-        if (status.equals("Sent") || status.equals("Stored")) {
-            storeMessage();
+        if (this.status.equals("Sent") || this.status.equals("Stored")) {
+            storeMessage(); // Now this WILL run
         }
     }
- public String getFullDetails() {
+    
+    public String getFullDetails() {
         return "MessageID: " + messageID +
                "\nMessageHash: " + messageHash +
                "\nRecipient: " + recipient +
@@ -155,39 +152,37 @@ public class message {
     public static int getTotalMessagesStatic() {
         return totalSent;
     }
-    
-     
-public boolean storeMessage() {
-
-    String fileName = "stored_message_" + messageID + ".json"; 
-
-    try (FileWriter writer = new FileWriter(fileName)) {
-
-        writer.write("{\n");
-        writer.write("  \"messageID\": \"" + escapeJSON(messageID) + "\",\n");
-        writer.write("  \"messageNumber\": " + messageNumber + ",\n");
-        writer.write("  \"messageHash\": \"" + escapeJSON(messageHash) + "\",\n");
-        writer.write("  \"recipient\": \"" + escapeJSON(recipient) + "\",\n");
-        writer.write("  \"message\": \"" + escapeJSON(message) + "\"\n");
-        writer.write("}\n");
-
-        System.out.println("Message stored in " + fileName);
-        return true;
-
-    } catch (IOException e) {
-        System.out.println("Error storing message: " + e.getMessage());
-        return false;
+        
+    public boolean storeMessage() {
+        String fileName = "stored_message_" + messageID + ".json"; 
+        try {
+           
+            
+            try (FileWriter writer = new FileWriter(fileName)) {
+                writer.write("{\n");
+                writer.write("  \"messageID\": \"" + escapeJSON(messageID) + "\",\n");
+                writer.write("  \"messageNumber\": " + messageNumber + ",\n");
+                writer.write("  \"messageHash\": \"" + escapeJSON(messageHash) + "\",\n");
+                writer.write("  \"recipient\": \"" + escapeJSON(recipient) + "\",\n");
+                writer.write("  \"message\": \"" + escapeJSON(message) + "\"\n");
+                writer.write("}\n");
+                System.out.println("Message stored in " + fileName);
+                return true;
+            }
+        } catch (IOException e) {
+            System.out.println("Error storing message: " + e.getMessage());
+            return false;
+        }
     }
-}
 
-private String escapeJSON(String text) {
-    return text.replace("\\", "\\\\")
-               .replace("\"", "\\\"")
-               .replace("\n", "\\n")
-               .replace("\r", "\\r")
-               .replace("\t", "\\t");
-}
+    private String escapeJSON(String text) {
+        return text.replace("\\", "\\\\")
+                   .replace("\"", "\\\"")
+                   .replace("\n", "\\n")
+                   .replace("\r", "\\r")
+                   .replace("\t", "\\t");
+    }
 
-      public String getMessageID() { return messageID; }
+    public String getMessageID() { return messageID; }
     public String getMessageHash() { return messageHash; }
 }

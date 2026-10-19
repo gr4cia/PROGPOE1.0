@@ -127,7 +127,7 @@ public class message {
             sentReport = sentReport + getFullDetails() + "\n----------------\n";
         }
         if (this.status.equals("Sent") || this.status.equals("Stored")) {
-            storeMessage(); // Now this WILL run
+            storeMessage(); 
         }
     }
     

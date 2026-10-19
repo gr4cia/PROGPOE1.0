@@ -4,11 +4,11 @@
  */
 package com.mycompany.poe;
 
-import java.util.Random;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 /**
  *
  * @author Student
@@ -155,14 +155,19 @@ public class message {
     public static int getTotalMessagesStatic() {
         return totalSent;
     }
-     public void storeMessage() {
+        public void storeMessage() {
         String fileName = "messages.json";
         String existing = "[]";
+        java.nio.file.Path filePath = java.nio.file.Paths.get(fileName);
+        
         try {
-            if (Files.exists(Paths.get(fileName))) {
-                existing = new String(Files.readAllBytes(Paths.get(fileName)));
-                if (existing.trim().isEmpty()) existing = "[]";
+            
+            if (!java.nio.file.Files.exists(filePath)) {
+                java.nio.file.Files.createFile(filePath);
+                java.nio.file.Files.write(filePath, "[]".getBytes());
             }
+            existing = new String(java.nio.file.Files.readAllBytes(filePath));
+            if (existing.trim().isEmpty()) existing = "[]";
         } catch (IOException e) {
             existing = "[]";
         }

@@ -16,7 +16,7 @@ public class Poe {
         Scanner input = new Scanner(System.in);
         Login system = new Login();
 
-        // ---------- PART 1 - REGISTRATION ----------
+        
         System.out.println("=== Registration ===");
         System.out.print("Enter first name: ");
         String firstName = input.nextLine();
@@ -38,7 +38,7 @@ public class Poe {
             return;
         }
 
-        // ---------- PART 1 - LOGIN ----------
+      
         System.out.println("\n=== Login ===");
         System.out.print("Enter username: ");
         String loginUser = input.nextLine();
@@ -52,7 +52,7 @@ public class Poe {
             return;
         }
 
-        // ---------- PART 2 & 3 - QUICKCHAT ----------
+        
         System.out.println("\nWelcome to QuickChat.");
         System.out.print("How many messages do you wish to enter? ");
         int limit = Integer.parseInt(input.nextLine());
@@ -78,7 +78,7 @@ public class Poe {
                     System.out.print("Enter recipient (+27... 10-13 chars): ");
                     String recipient = input.nextLine();
                     
-                    // Check recipient using your message class
+                    
                     message temp = new message(messagesEntered + 1, recipient, "test");
                     System.out.println(temp.checkRecipientCell());
                     if (!temp.isRecipientValid()) {
@@ -115,7 +115,7 @@ public class Poe {
                         }
                         messagesEntered++;
                     } else if (sendOption.equals("1") || sendOption.equals("3")) {
-                        // THIS CREATES THE FILE stored_message_XXXXXXXXXX.json
+                        
                         msg.recordMessage();
                         messagesEntered++;
                         System.out.println("File created: stored_message_" + msg.getMessageID() + ".json");

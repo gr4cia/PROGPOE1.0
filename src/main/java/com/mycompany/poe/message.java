@@ -88,7 +88,7 @@ public class message {
 
         String des = message.trim();
 
-        // First word - same as masterclass
+       
         String firstWord;
         int firstSpace = des.indexOf(" ");
         if (firstSpace == -1) {

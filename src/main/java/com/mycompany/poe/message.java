@@ -155,46 +155,39 @@ public class message {
     public static int getTotalMessagesStatic() {
         return totalSent;
     }
-        public void storeMessage() {
-        String fileName = "messages.json";
-        String existing = "[]";
-        java.nio.file.Path filePath = java.nio.file.Paths.get(fileName);
-        
-        try {
-            
-            if (!java.nio.file.Files.exists(filePath)) {
-                java.nio.file.Files.createFile(filePath);
-                java.nio.file.Files.write(filePath, "[]".getBytes());
-            }
-            existing = new String(java.nio.file.Files.readAllBytes(filePath));
-            if (existing.trim().isEmpty()) existing = "[]";
-        } catch (IOException e) {
-            existing = "[]";
-        }
+    
+     
+public boolean storeMessage() {
 
-        String safeMsg = message.replace("\"", "'");
-        String jsonObj = "{\"MessageID\":\"" + messageID + "\",\"MessageNumber\":" + messageNumber + ",\"MessageHash\":\"" + messageHash + "\",\"Recipient\":\"" + recipient + "\",\"Message\":\"" + safeMsg + "\"}";
+    String fileName = "stored_message_" + messageID + ".json"; 
 
-        String newContent;
-        if (existing.trim().equals("[]")) {
-            newContent = "[" + jsonObj + "]";
-        } else {
-            newContent = existing.trim();
-            if (newContent.endsWith("]")) {
-                newContent = newContent.substring(0, newContent.length() - 1);
-                if (!newContent.trim().endsWith("[")) newContent += ",";
-                newContent += jsonObj + "]";
-            } else {
-                newContent = "[" + jsonObj + "]";
-            }
-        }
+    try (FileWriter writer = new FileWriter(fileName)) {
 
-        try (FileWriter file = new FileWriter(fileName)) {
-            file.write(newContent);
-        } catch (IOException e) {
-            System.out.println("Error storing: " + e.getMessage());
-        }
+        writer.write("{\n");
+        writer.write("  \"messageID\": \"" + escapeJSON(messageID) + "\",\n");
+        writer.write("  \"messageNumber\": " + messageNumber + ",\n");
+        writer.write("  \"messageHash\": \"" + escapeJSON(messageHash) + "\",\n");
+        writer.write("  \"recipient\": \"" + escapeJSON(recipient) + "\",\n");
+        writer.write("  \"message\": \"" + escapeJSON(message) + "\"\n");
+        writer.write("}\n");
+
+        System.out.println("Message stored in " + fileName);
+        return true;
+
+    } catch (IOException e) {
+        System.out.println("Error storing message: " + e.getMessage());
+        return false;
     }
+}
+
+private String escapeJSON(String text) {
+    return text.replace("\\", "\\\\")
+               .replace("\"", "\\\"")
+               .replace("\n", "\\n")
+               .replace("\r", "\\r")
+               .replace("\t", "\\t");
+}
+
       public String getMessageID() { return messageID; }
     public String getMessageHash() { return messageHash; }
 }

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
+import java.ArrayList;
+import java.util.List;
 
 
 /**
@@ -126,6 +128,7 @@ public class message {
     }
 
     public void recordMessage() {
+     
         totalCaptured = totalCaptured + 1;
         if (this.status.equals("Sent")) {
             totalSent = totalSent + 1;
@@ -190,130 +193,10 @@ public class message {
 
     public String getMessageID() { return messageID; }
     public String getMessageHash() { return messageHash; }
-    
-    // --- PART 3 ARRAYS ---
-public static java.util.List<message> sentList = new java.util.ArrayList<>();
-public static java.util.List<message> disregardedList = new java.util.ArrayList<>();
-public static java.util.List<message> storedList = new java.util.ArrayList<>();
-public static java.util.List<String> hashList = new java.util.ArrayList<>();
-public static java.util.List<String> idList = new java.util.ArrayList<>();
-
-public static void clearAllLists() {
-    sentList.clear();
-    disregardedList.clear();
-    storedList.clear();
-    hashList.clear();
-    idList.clear();
-}
-
-public static void addToLists(message m) {
-    // This is called from recordMessage()
-    if (m.getStatus().equals("Sent")) sentList.add(m);
-    if (m.getStatus().equals("Disregarded")) disregardedList.add(m);
-    if (m.getStatus().equals("Stored")) storedList.add(m);
-    hashList.add(m.getMessageHash());
-    idList.add(m.getMessageID());
-}
-
-// 1. Sent Messages array
-public static String getSentMessages() {
-    String out = "";
-    for (int i = 0; i < sentList.size(); i++) {
-        out += sentList.get(i).getMessage();
-        if (i < sentList.size() - 1) out += ", ";
-    }
-    return out;
-}
-
-// 2. Longest Message (from all 1-4)
-public static String getLongestMessage() {
-    java.util.List<message> all = new java.util.ArrayList<>();
-    all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
-    String longest = "";
-    for (message m : all) {
-        if (m.getMessage().length() > longest.length()) longest = m.getMessage();
-    }
-    return longest;
-}
-
-// 3. Search by Message ID
-public static String searchByID(String id) {
-    java.util.List<message> all = new java.util.ArrayList<>();
-    all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
-    for (message m : all) {
-        if (m.getMessageID().equals(id)) return m.getMessage();
-    }
-    return "Message not found.";
-}
-
-// 4. Search by Recipient (Sent + Stored)
-public static String searchByRecipient(String recipient) {
-    String out = "";
-    for (message m : sentList) {
-        if (m.getRecipient().equals(recipient)) out += m.getMessage() + ", ";
-    }
-    for (message m : storedList) {
-        if (m.getRecipient().equals(recipient)) out += m.getMessage() + ", ";
-    }
-    if (out.length() > 2) out = out.substring(0, out.length() - 2);
-    return out;
-}
-
-// 5. Delete by Hash
-public static String deleteByHash(String hash) {
-    java.util.List<message> all = new java.util.ArrayList<>();
-    all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
-    for (message m : all) {
-        if (m.getMessageHash().equals(hash)) {
-            String msgText = m.getMessage();
-            sentList.remove(m); storedList.remove(m); disregardedList.remove(m);
-            return "Message: \"" + msgText + "\" successfully deleted.";
-        }
-    }
-    return "Message not found.";
-}
-
-// 6. Display Report - Hash, Recipient, Message for Sent
-public static String displayReport() {
-    String out = "";
-    for (message m : sentList) {
-        out += "Message Hash: " + m.getMessageHash() + "\n";
-        out += "Recipient: " + m.getRecipient() + "\n";
-        out += "Message: " + m.getMessage() + "\n\n";
-    }
-    return out;
-}
-
-// --- STORED MESSAGES MENU (2a - 2f) ---
-public static String displayStoredSenderRecipient() {
-    String out = "";
-    for (message m : storedList) {
-        out += "Sender: Developer | Recipient: " + m.getRecipient() + "\n";
-    }
-    return out;
-}
-
-public static String getLongestStoredMessage() {
-    String longest = "";
-    for (message m : storedList) {
-        if (m.getMessage().length() > longest.length()) longest = m.getMessage();
-    }
-    return longest;
-}
-
-public static String searchStoredByID(String id) {
-    for (message m : storedList) {
-        if (m.getMessageID().equals(id)) return "Recipient: " + m.getRecipient() + "\nMessage: " + m.getMessage();
-    }
-    return "Not found.";
-}
-
-public static String displayFullStoredReport() {
-    String out = "";
-    for (message m : storedList) {
-        out += m.getFullDetails() + "\n\n";
-    }
-    return out;
-}
-
+  
+     public static List<message> sentList = new ArrayList<>();
+    public static List<message> disregardedList = new ArrayList<>();
+    public static List<message> storedList = new ArrayList<>();
+    public static List<String> hashList = new ArrayList<>();
+    public static List<String> idList = new ArrayList<>();
 }

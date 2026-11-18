@@ -4,6 +4,7 @@
  */
 package com.mycompany.poe;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,6 +19,7 @@ import java.util.List;
  * @author Student
  */
 public class message {
+    // Instance variables
     private String messageID;
     private int messageNumber;
     private String recipient;
@@ -27,12 +29,15 @@ public class message {
 
     private static int totalSent = 0;
 
-   
-    public static List<message> sentList = new ArrayList<>();
-    public static List<message> disregardedList = new ArrayList<>();
-    public static List<message> storedList = new ArrayList<>();
-    public static List<String> hashList = new ArrayList<>();
-    public static List<String> idList = new ArrayList<>();
+    public static String[] messageIDArray = new String[100];
+    public static String[] recipientArray = new String[100];
+    public static String[] messageArray = new String[100];
+    public static String[] hashArray = new String[100];
+    public static String[] flagArray = new String[100]; 
+    public static int messageCount = 0;
+
+    public static String[] sentMessagesArray = new String[100];
+    public static int sentCount = 0;
 
     public message(int messageNumber, String recipient, String messageText) {
         this.messageNumber = messageNumber;
@@ -52,10 +57,12 @@ public class message {
         return id;
     }
 
+   
     public void setMessageID(String id) {
         this.messageID = id;
     }
 
+    
     public String getMessageID() { return messageID; }
     public String getRecipient() { return recipient; }
     public String getMessage() { return messageText; }
@@ -63,6 +70,7 @@ public class message {
     public String getStatus() { return status; }
     public int getMessageNumber() { return messageNumber; }
 
+   
     public boolean isRecipientValid() {
         return recipient.startsWith("+27") && recipient.length() == 12;
     }
@@ -74,10 +82,12 @@ public class message {
         return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
     }
 
+    
     public boolean isMessageLengthValid() {
         return messageText.length() <= 250;
     }
 
+    
     public String createMessageHash() {
         String[] words = messageText.split(" ");
         String first = words[0];
@@ -87,7 +97,7 @@ public class message {
         return hash;
     }
 
-
+    
     public String SentMessage(String option) {
         if (option.equals("1")) {
             status = "Sent";
@@ -112,20 +122,33 @@ public class message {
              + "Message: " + messageText;
     }
 
+    
     public static void clearAllLists() {
-        sentList.clear();
-        disregardedList.clear();
-        storedList.clear();
-        hashList.clear();
-        idList.clear();
+        messageCount = 0;
+        sentCount = 0;
+        for (int i = 0; i < 100; i++) {
+            messageIDArray[i] = null;
+            recipientArray[i] = null;
+            messageArray[i] = null;
+            hashArray[i] = null;
+            flagArray[i] = null;
+            sentMessagesArray[i] = null;
+        }
     }
 
+    
     public static void addToLists(message m) {
-        if (m.getStatus().equals("Sent")) sentList.add(m);
-        if (m.getStatus().equals("Disregarded")) disregardedList.add(m);
-        if (m.getStatus().equals("Stored")) storedList.add(m);
-        hashList.add(m.getMessageHash());
-        idList.add(m.getMessageID());
+        messageIDArray[messageCount] = m.getMessageID();
+        recipientArray[messageCount] = m.getRecipient();
+        messageArray[messageCount] = m.getMessage();
+        hashArray[messageCount] = m.getMessageHash();
+        flagArray[messageCount] = m.getStatus();
+        messageCount++;
+
+        if (m.getStatus().equals("Sent")) {
+            sentMessagesArray[sentCount] = m.getMessage();
+            sentCount++;
+        }
     }
 
     public void recordMessage() {
@@ -146,12 +169,11 @@ public class message {
         totalSent = 0;
     }
 
-   
+    
     public void storeMessage() {
         try {
             String fileName = "stored_messages.json";
-            
-            java.io.File file = new java.io.File(fileName);
+            File file = new File(fileName);
             String existing = "";
             if (file.exists()) {
                 java.util.Scanner sc = new java.util.Scanner(file);
@@ -163,7 +185,6 @@ public class message {
             if (existing.isEmpty() || existing.equals("[]")) {
                 toWrite = "[" + newEntry + "]";
             } else {
-               
                 toWrite = existing.substring(0, existing.length() - 1) + "," + newEntry + "]";
             }
             FileWriter writer = new FileWriter(fileName);
@@ -174,97 +195,123 @@ public class message {
         }
     }
 
-  
     public static String getSentMessages() {
         String out = "";
-        for (int i = 0; i < sentList.size(); i++) {
-            out += sentList.get(i).getMessage();
-            if (i < sentList.size() - 1) out += ", ";
+        for (int i = 0; i < sentCount; i++) {
+            out += sentMessagesArray[i];
+            if (i < sentCount - 1) out += ", ";
         }
         return out;
     }
-
+  
     public static String getLongestMessage() {
-        List<message> all = new ArrayList<>();
-        all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
         String longest = "";
-        for (message m : all) {
-            if (m.getMessage().length() > longest.length()) longest = m.getMessage();
+        for (int i = 0; i < messageCount; i++) {
+            if (messageArray[i].length() > longest.length()) longest = messageArray[i];
         }
         return longest;
     }
 
     public static String searchByID(String id) {
-        List<message> all = new ArrayList<>();
-        all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
-        for (message m : all) {
-            if (m.getMessageID().equals(id)) return m.getMessage();
+        for (int i = 0; i < messageCount; i++) {
+            if (messageIDArray[i].equals(id)) return messageArray[i];
         }
         return "Message not found.";
     }
 
     public static String searchByRecipient(String recipient) {
         String out = "";
-        for (message m : sentList) {
-            if (m.getRecipient().equals(recipient)) out += m.getMessage() + ", ";
-        }
-        for (message m : storedList) {
-            if (m.getRecipient().equals(recipient)) out += m.getMessage() + ", ";
+        for (int i = 0; i < messageCount; i++) {
+            if (recipientArray[i].equals(recipient) && (flagArray[i].equals("Sent") || flagArray[i].equals("Stored"))) {
+                out += messageArray[i] + ", ";
+            }
         }
         if (out.length() > 2) out = out.substring(0, out.length() - 2);
         return out;
     }
 
     public static String deleteByHash(String hash) {
-        List<message> all = new ArrayList<>();
-        all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
-        for (message m : all) {
-            if (m.getMessageHash().equals(hash)) {
-                String msgText = m.getMessage();
-                sentList.remove(m); storedList.remove(m); disregardedList.remove(m);
+        for (int i = 0; i < messageCount; i++) {
+            if (hashArray[i].equals(hash)) {
+                String msgText = messageArray[i];
+                for (int j = i; j < messageCount - 1; j++) {
+                    messageIDArray[j] = messageIDArray[j + 1];
+                    recipientArray[j] = recipientArray[j + 1];
+                    messageArray[j] = messageArray[j + 1];
+                    hashArray[j] = hashArray[j + 1];
+                    flagArray[j] = flagArray[j + 1];
+                }
+                messageCount--;
                 return "Message: \"" + msgText + "\" successfully deleted.";
             }
         }
         return "Message not found.";
     }
 
+    public static String readStoredMessagesFromFile() {
+        try {
+            File file = new File("stored_messages.json");
+            if (!file.exists()) return "No stored messages found.";
+            java.util.Scanner sc = new java.util.Scanner(file);
+            String content = "";
+            while (sc.hasNextLine()) content += sc.nextLine();
+            sc.close();
+            return content;
+        } catch (Exception e) {
+            return "Error reading file: " + e.getMessage();
+        }
+    }
+
     public static String displayReport() {
         String out = "";
-        for (message m : sentList) {
-            out += "Message Hash: " + m.getMessageHash() + "\n";
-            out += "Recipient: " + m.getRecipient() + "\n";
-            out += "Message: " + m.getMessage() + "\n\n";
+        for (int i = 0; i < messageCount; i++) {
+            if (flagArray[i].equals("Sent")) {
+                out += "Message Hash: " + hashArray[i] + "\n";
+                out += "Recipient: " + recipientArray[i] + "\n";
+                out += "Message: " + messageArray[i] + "\n\n";
+            }
         }
         return out;
     }
 
     public static String displayStoredSenderRecipient() {
         String out = "";
-        for (message m : storedList) {
-            out += "Sender: Developer | Recipient: " + m.getRecipient() + "\n";
+        for (int i = 0; i < messageCount; i++) {
+            if (flagArray[i].equals("Stored")) {
+                out += "Sender: Developer | Recipient: " + recipientArray[i] + "\n";
+            }
         }
         return out;
     }
 
     public static String getLongestStoredMessage() {
         String longest = "";
-        for (message m : storedList) {
-            if (m.getMessage().length() > longest.length()) longest = m.getMessage();
+        for (int i = 0; i < messageCount; i++) {
+            if (flagArray[i].equals("Stored") && messageArray[i].length() > longest.length()) {
+                longest = messageArray[i];
+            }
         }
         return longest;
     }
 
     public static String searchStoredByID(String id) {
-        for (message m : storedList) {
-            if (m.getMessageID().equals(id)) return "Recipient: " + m.getRecipient() + "\nMessage: " + m.getMessage();
+        for (int i = 0; i < messageCount; i++) {
+            if (flagArray[i].equals("Stored") && messageIDArray[i].equals(id)) {
+                return "Recipient: " + recipientArray[i] + "\nMessage: " + messageArray[i];
+            }
         }
         return "Not found.";
     }
 
     public static String displayFullStoredReport() {
         String out = "";
-        for (message m : storedList) {
-            out += m.getFullDetails() + "\n\n";
+        for (int i = 0; i < messageCount; i++) {
+            if (flagArray[i].equals("Stored")) {
+                out += "Message ID: " + messageIDArray[i] + "\n";
+                out += "Message Hash: " + hashArray[i] + "\n";
+                out += "Recipient: " + recipientArray[i] + "\n";
+                out += "Message: " + messageArray[i] + "\n\n";
+            }
         }
         return out;
     }

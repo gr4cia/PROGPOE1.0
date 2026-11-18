@@ -11,129 +11,122 @@
 import java.util.Scanner;
 
 public class Poe {
-
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        Login system = new Login();
+        Login login = new Login();
 
-        
-        System.out.println("=== Registration ===");
-        System.out.print("Enter first name: ");
-        String firstName = input.nextLine();
-        System.out.print("Enter last name: ");
-        String lastName = input.nextLine();
-        System.out.print("Enter username (must contain _ and <=5 chars): ");
-        String username = input.nextLine();
-        System.out.print("Enter password (8 chars, capital, number, special): ");
-        String password = input.nextLine();
-        System.out.print("Enter cell (+27xxxxxxxxx): ");
-        String cell = input.nextLine();
+        System.out.print("Enter First Name: ");
+        String first = input.nextLine();
+        System.out.print("Enter Last Name: ");
+        String last = input.nextLine();
+        System.out.print("Enter Username (must contain _ and <=5 chars): ");
+        String user = input.nextLine();
+        System.out.print("Enter Password: ");
+        String pass = input.nextLine();
 
-        String regResult = system.registerUser(username, password, cell, firstName, lastName);
-        System.out.println(regResult);
+        System.out.println(login.registerUser(user, pass, pass, first, last));
 
-        if (!regResult.contains("successfully")) {
-            System.out.println("Registration failed. Fix errors and run again.");
-            input.close();
-            return;
-        }
-
-      
-        System.out.println("\n=== Login ===");
-        System.out.print("Enter username: ");
+        System.out.print("Login - Enter Username: ");
         String loginUser = input.nextLine();
-        System.out.print("Enter password: ");
+        System.out.print("Login - Enter Password: ");
         String loginPass = input.nextLine();
+        System.out.println(login.returnLoginStatus(loginUser, loginPass));
 
-        System.out.println(system.returnLoginStatus(loginUser, loginPass));
-
-        if (!system.loginUser(loginUser, loginPass)) {
-            input.close();
+        if (!login.loginUser(loginUser, loginPass)) {
+            System.out.println("Login failed. Exiting.");
             return;
         }
 
-        
-        System.out.println("\nWelcome to QuickChat.");
-        System.out.print("How many messages do you wish to enter? ");
-        int limit = Integer.parseInt(input.nextLine());
+        System.out.println("Welcome to QuickChat.");
 
-        int messagesEntered = 0;
-        boolean running = true;
-
-        while (running) {
-            System.out.println("\n--- QuickChat Menu ---");
-            System.out.println("1) Send Messages");
-            System.out.println("2) Show recently sent messages");
-            System.out.println("3) Quit");
+        int msgNum = 1;
+        while (true) {
+            System.out.println("\n1. Send Messages");
+            System.out.println("2. Show recently sent messages");
+            System.out.println("3. Stored Messages");
+            System.out.println("4. Quit");
             System.out.print("Choose: ");
-            String choice = input.nextLine();
+            String mainChoice = input.nextLine();
 
-            switch (choice) {
-                case "1":
-                    if (messagesEntered >= limit) {
-                        System.out.println("You have reached your message limit of " + limit);
-                        break;
+            if (mainChoice.equals("4")) {
+                System.out.println("Total messages sent: " + message.getTotalMessagesStatic());
+                break;
+            }
+
+            if (mainChoice.equals("1")) {
+                System.out.print("How many messages do you wish to enter? ");
+                int limit = Integer.parseInt(input.nextLine());
+
+                for (int i = 0; i < limit; i++) {
+                    // Recipient with re-ask
+                    String recipient = "";
+                    while (true) {
+                        System.out.print("Enter recipient (+27...): ");
+                        recipient = input.nextLine();
+                        message temp = new message(msgNum, recipient, "test");
+                        System.out.println(temp.checkRecipientCell());
+                        if (temp.isRecipientValid()) break;
                     }
 
-                    System.out.print("Enter recipient (+27... 10-13 chars): ");
-                    String recipient = input.nextLine();
-                    
-                    
-                    message temp = new message(messagesEntered + 1, recipient, "test");
-                    System.out.println(temp.checkRecipientCell());
-                    if (!temp.isRecipientValid()) {
-                        break;
+                    // Message text with re-ask
+                    String text = "";
+                    while (true) {
+                        System.out.print("Enter message (max 250 chars): ");
+                        text = input.nextLine();
+                        message temp = new message(msgNum, recipient, text);
+                        if (temp.isMessageLengthValid()) break;
+                        System.out.println("Please enter a message of less than 250 characters.");
                     }
 
-                    System.out.print("Enter message (max 250 chars): ");
-                    String text = input.nextLine();
-
-                    message msg = new message(messagesEntered + 1, recipient, text);
-                    System.out.println(msg.checkMessageLength());
-                    if (!msg.isMessageLengthValid()) {
-                        break;
-                    }
-
-                    System.out.println(msg.getGeneratedIDMessage());
+                    message msg = new message(msgNum, recipient, text);
                     System.out.println("Message Hash: " + msg.getMessageHash());
-                    System.out.println(msg.getFullDetails());
 
-                    System.out.println("\n1) Send Message");
-                    System.out.println("2) Disregard Message");
-                    System.out.println("3) Store Message to send later");
+                    System.out.println("1. Send Message");
+                    System.out.println("2. Disregard Message");
+                    System.out.println("3. Store Message");
                     System.out.print("Choose: ");
-                    String sendOption = input.nextLine();
+                    String sendChoice = input.nextLine();
 
-                    String result = msg.SentMessage(sendOption);
+                    String result = msg.SentMessage(sendChoice);
                     System.out.println(result);
 
-                    if (sendOption.equals("2")) {
-                        System.out.print("Enter 0 to delete: ");
-                        String del = input.nextLine();
-                        if (del.equals("0")) {
-                            System.out.println("Message deleted.");
-                        }
-                        messagesEntered++;
-                    } else if (sendOption.equals("1") || sendOption.equals("3")) {
-                        
-                        msg.recordMessage();
-                        messagesEntered++;
-                        System.out.println("File created: stored_message_" + msg.getMessageID() + ".json");
+                    if (msg.getStatus().equals("Sent")) {
+                        System.out.println(msg.getFullDetails());
                     }
-                    break;
+                    msg.recordMessage();
+                    msgNum++;
+                }
+            }
 
-                case "2":
-                    System.out.println("\n" + message.printMessagesStatic());
-                    break;
+            if (mainChoice.equals("2")) {
+                System.out.println("Sent Messages: " + message.getSentMessages());
+                System.out.println("Longest: " + message.getLongestMessage());
+            }
 
-                case "3":
-                    System.out.println("\nTotal messages sent: " + message.getTotalMessagesStatic());
-                    System.out.println("Goodbye!");
-                    running = false;
-                    break;
-
-                default:
-                    System.out.println("Invalid choice.");
+            if (mainChoice.equals("3")) {
+                System.out.println("a. Display sender and recipient of stored messages");
+                System.out.println("b. Display longest stored message");
+                System.out.println("c. Search for message ID");
+                System.out.println("d. Search for all messages for a recipient");
+                System.out.println("e. Delete a message using hash");
+                System.out.println("f. Display report");
+                System.out.print("Choose a-f: ");
+                String c = input.nextLine().toLowerCase();
+                if (c.equals("a")) System.out.println(message.displayStoredSenderRecipient());
+                if (c.equals("b")) System.out.println(message.getLongestStoredMessage());
+                if (c.equals("c")) {
+                    System.out.print("Enter Message ID: ");
+                    System.out.println(message.searchStoredByID(input.nextLine()));
+                }
+                if (c.equals("d")) {
+                    System.out.print("Enter Recipient: ");
+                    System.out.println(message.searchByRecipient(input.nextLine()));
+                }
+                if (c.equals("e")) {
+                    System.out.print("Enter Message Hash: ");
+                    System.out.println(message.deleteByHash(input.nextLine()));
+                }
+                if (c.equals("f")) System.out.println(message.displayFullStoredReport());
             }
         }
         input.close();

@@ -85,14 +85,41 @@ public class Poe {
                     System.out.print("Choose: ");
                     String sendChoice = input.nextLine();
 
-                    String result = msg.SentMessage(sendChoice);
-                    System.out.println(result);
+                   String result = msg.SentMessage(sendChoice);
+System.out.println(result);
 
-                    if (msg.getStatus().equals("Sent")) {
-                        System.out.println(msg.getFullDetails());
-                    }
-                    msg.recordMessage();
-                    msgNum++;
+
+if (msg.getStatus().equals("Disregarded")) {
+    System.out.print("Press 0 to delete message or press any other key to keep it: ");
+    String deleteChoice = input.nextLine();
+    if (deleteChoice.equals("0")) {
+        msg.SentMessage("0");
+        System.out.println("Message deleted.");
+        msgNum++;
+        continue; 
+    }
+}
+
+
+System.out.println(result);
+
+
+if (msg.getStatus().equals("Disregarded")) {
+    System.out.print("Press 0 to delete message or press any other key to keep it: ");
+    String deleteChoice = input.nextLine();
+    if (deleteChoice.equals("0")) {
+        msg.SentMessage("0"); 
+        System.out.println("Message deleted.");
+        msgNum++;
+        continue; 
+    }
+}
+
+if (msg.getStatus().equals("Sent")) {
+    System.out.println(msg.getFullDetails());
+}
+msg.recordMessage();
+msgNum++;
                 }
             }
 

@@ -18,21 +18,26 @@ import java.util.List;
  * @author Student
  */
 public class message {
-   private String messageID;
+    private String messageID;
     private int messageNumber;
     private String recipient;
-    private String message;
+    private String messageText;
     private String messageHash;
     private String status;
-    
-    private static int totalCaptured = 0;
-    private static int totalSent = 0;
-    private static String sentReport = "";
 
-    public message(int messageNumber, String recipient, String message) {
+    private static int totalSent = 0;
+
+   
+    public static List<message> sentList = new ArrayList<>();
+    public static List<message> disregardedList = new ArrayList<>();
+    public static List<message> storedList = new ArrayList<>();
+    public static List<String> hashList = new ArrayList<>();
+    public static List<String> idList = new ArrayList<>();
+
+    public message(int messageNumber, String recipient, String messageText) {
         this.messageNumber = messageNumber;
         this.recipient = recipient;
-        this.message = message;
+        this.messageText = messageText;
         this.messageID = generateMessageID();
         this.messageHash = createMessageHash();
         this.status = "";
@@ -40,163 +45,227 @@ public class message {
 
     public static String generateMessageID() {
         Random rand = new Random();
-        StringBuilder id = new StringBuilder();
+        String id = "";
         for (int i = 0; i < 10; i++) {
-            id.append(rand.nextInt(10));
+            id = id + rand.nextInt(10);
         }
-        return id.toString();
-    }
-    public void setmessageID(String id){
-    this.messageID = id;
+        return id;
     }
 
-    public boolean checkMessageID() {
-        return messageID.length() == 10;
+    public void setMessageID(String id) {
+        this.messageID = id;
     }
 
-    public String getGeneratedIDMessage() {
-        return "Message ID generated: " + messageID;
-    }
-    
-    public String checkRecipientCell() {
-        if (recipient == null) {
-            return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
-        }
-        if (recipient.startsWith("+") && recipient.length() >= 10 && recipient.length() <= 13) {
-            return "Cell phone number successfully captured.";
-        } else {
-            return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
-        }
-    }
+    public String getMessageID() { return messageID; }
+    public String getRecipient() { return recipient; }
+    public String getMessage() { return messageText; }
+    public String getMessageHash() { return messageHash; }
+    public String getStatus() { return status; }
+    public int getMessageNumber() { return messageNumber; }
 
     public boolean isRecipientValid() {
-        return checkRecipientCell().equals("Cell phone number successfully captured.");
+        return recipient.startsWith("+27") && recipient.length() == 12;
     }
-    
-    public String checkMessageLength() {
-        if (message.length() <= 250) {
-            return "Message ready to send.";
-        } else {
-            int over = message.length() - 250;
-            return "Message exceeds 250 characters by " + over + ", please reduce the size.";
+
+    public String checkRecipientCell() {
+        if (isRecipientValid()) {
+            return "Cell phone number successfully captured.";
         }
+        return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
     }
 
     public boolean isMessageLengthValid() {
-        return message.length() <= 250;
-    }
-    
-    public String createMessageHash() {
-        String firstTwo = messageID.substring(0, 2);
-        if (message == null || message.trim().isEmpty()) {
-            return (firstTwo + ":" + messageNumber + ":EMPTY").toUpperCase();
-        }
-        String des = message.trim();
-        String firstWord;
-        int firstSpace = des.indexOf(" ");
-        if (firstSpace == -1) {
-            firstWord = des;
-        } else {
-            firstWord = des.substring(0, firstSpace);
-        }
-        String lastWord;
-        int lastSpace = des.lastIndexOf(" ");
-        if (lastSpace == -1) {
-            lastWord = des;
-        } else {
-            lastWord = des.substring(lastSpace + 1);
-        }
-        firstWord = firstWord.replaceAll("[^a-zA-Z0-9]", "");
-        lastWord = lastWord.replaceAll("[^a-zA-Z0-9]", "");
-        return (firstTwo + ":" + messageNumber + ":" + firstWord + lastWord).toUpperCase();
+        return messageText.length() <= 250;
     }
 
-    
-    public String SentMessage(String choice) {
-        String c = choice.toLowerCase();
-        if (c.equals("1") || c.contains("send")) {
-            this.status = "Sent"; 
+    public String createMessageHash() {
+        String[] words = messageText.split(" ");
+        String first = words[0];
+        String last = words[words.length - 1].replaceAll("[^a-zA-Z]", "").toUpperCase();
+        String hash = messageID.substring(0, 2) + ":" + messageNumber + ":" + first.toUpperCase() + last;
+        this.messageHash = hash;
+        return hash;
+    }
+
+
+    public String SentMessage(String option) {
+        if (option.equals("1")) {
+            status = "Sent";
             return "Message successfully sent.";
-        } else if (c.equals("2") || c.contains("disregard") || c.contains("discard") || c.equals("0")) {
-            this.status = "Disregarded";
-            return "Press 0 delete the message.";
-        } else if (c.equals("3") || c.contains("store")) {
-            this.status = "Stored"; 
+        } else if (option.equals("2")) {
+            status = "Disregarded";
+            return "Press 0 to delete message.";
+        } else if (option.equals("3")) {
+            status = "Stored";
             return "Message successfully stored.";
+        } else if (option.equals("0")) {
+            status = "Deleted";
+            return "Message deleted.";
         }
         return "Invalid option.";
     }
 
-    public void recordMessage() {
-     
-        totalCaptured = totalCaptured + 1;
-        if (this.status.equals("Sent")) {
-            totalSent = totalSent + 1;
-            sentReport = sentReport + getFullDetails() + "\n----------------\n";
-        }
-        if (this.status.equals("Sent") || this.status.equals("Stored")) {
-            storeMessage(); 
-        }
-    }
-    
     public String getFullDetails() {
-        return "MessageID: " + messageID +
-               "\nMessageHash: " + messageHash +
-               "\nRecipient: " + recipient +
-               "\nMessage: " + message;
+        return "Message ID: " + messageID + "\n"
+             + "Message Hash: " + messageHash + "\n"
+             + "Recipient: " + recipient + "\n"
+             + "Message: " + messageText;
     }
 
-    public static String printMessagesStatic() {
-        if (sentReport.equals("")) {
-            return "No messages sent.";
+    public static void clearAllLists() {
+        sentList.clear();
+        disregardedList.clear();
+        storedList.clear();
+        hashList.clear();
+        idList.clear();
+    }
+
+    public static void addToLists(message m) {
+        if (m.getStatus().equals("Sent")) sentList.add(m);
+        if (m.getStatus().equals("Disregarded")) disregardedList.add(m);
+        if (m.getStatus().equals("Stored")) storedList.add(m);
+        hashList.add(m.getMessageHash());
+        idList.add(m.getMessageID());
+    }
+
+    public void recordMessage() {
+        if (status.equals("Sent")) {
+            totalSent++;
         }
-        return sentReport;
-    }
-
-    public int returnTotalMessages() {
-        return totalSent;
+        addToLists(this);
+        if (status.equals("Stored")) {
+            storeMessage();
+        }
     }
 
     public static int getTotalMessagesStatic() {
         return totalSent;
     }
-        
-    public boolean storeMessage() {
-        String fileName = "stored_message_" + messageID + ".json"; 
+
+    public static void resetTotal() {
+        totalSent = 0;
+    }
+
+   
+    public void storeMessage() {
         try {
-           
+            String fileName = "stored_messages.json";
             
-            try (FileWriter writer = new FileWriter(fileName)) {
-                writer.write("{\n");
-                writer.write("  \"messageID\": \"" + escapeJSON(messageID) + "\",\n");
-                writer.write("  \"messageNumber\": " + messageNumber + ",\n");
-                writer.write("  \"messageHash\": \"" + escapeJSON(messageHash) + "\",\n");
-                writer.write("  \"recipient\": \"" + escapeJSON(recipient) + "\",\n");
-                writer.write("  \"message\": \"" + escapeJSON(message) + "\"\n");
-                writer.write("}\n");
-                System.out.println("Message stored in " + fileName);
-                return true;
+            java.io.File file = new java.io.File(fileName);
+            String existing = "";
+            if (file.exists()) {
+                java.util.Scanner sc = new java.util.Scanner(file);
+                while (sc.hasNextLine()) existing += sc.nextLine();
+                sc.close();
             }
-        } catch (IOException e) {
+            String newEntry = "{\"id\":\"" + messageID + "\",\"hash\":\"" + messageHash + "\",\"recipient\":\"" + recipient + "\",\"message\":\"" + messageText.replace("\"", "") + "\"}";
+            String toWrite;
+            if (existing.isEmpty() || existing.equals("[]")) {
+                toWrite = "[" + newEntry + "]";
+            } else {
+               
+                toWrite = existing.substring(0, existing.length() - 1) + "," + newEntry + "]";
+            }
+            FileWriter writer = new FileWriter(fileName);
+            writer.write(toWrite);
+            writer.close();
+        } catch (Exception e) {
             System.out.println("Error storing message: " + e.getMessage());
-            return false;
         }
     }
 
-    private String escapeJSON(String text) {
-        return text.replace("\\", "\\\\")
-                   .replace("\"", "\\\"")
-                   .replace("\n", "\\n")
-                   .replace("\r", "\\r")
-                   .replace("\t", "\\t");
+  
+    public static String getSentMessages() {
+        String out = "";
+        for (int i = 0; i < sentList.size(); i++) {
+            out += sentList.get(i).getMessage();
+            if (i < sentList.size() - 1) out += ", ";
+        }
+        return out;
     }
 
-    public String getMessageID() { return messageID; }
-    public String getMessageHash() { return messageHash; }
-  
-     public static List<message> sentList = new ArrayList<>();
-    public static List<message> disregardedList = new ArrayList<>();
-    public static List<message> storedList = new ArrayList<>();
-    public static List<String> hashList = new ArrayList<>();
-    public static List<String> idList = new ArrayList<>();
+    public static String getLongestMessage() {
+        List<message> all = new ArrayList<>();
+        all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
+        String longest = "";
+        for (message m : all) {
+            if (m.getMessage().length() > longest.length()) longest = m.getMessage();
+        }
+        return longest;
+    }
+
+    public static String searchByID(String id) {
+        List<message> all = new ArrayList<>();
+        all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
+        for (message m : all) {
+            if (m.getMessageID().equals(id)) return m.getMessage();
+        }
+        return "Message not found.";
+    }
+
+    public static String searchByRecipient(String recipient) {
+        String out = "";
+        for (message m : sentList) {
+            if (m.getRecipient().equals(recipient)) out += m.getMessage() + ", ";
+        }
+        for (message m : storedList) {
+            if (m.getRecipient().equals(recipient)) out += m.getMessage() + ", ";
+        }
+        if (out.length() > 2) out = out.substring(0, out.length() - 2);
+        return out;
+    }
+
+    public static String deleteByHash(String hash) {
+        List<message> all = new ArrayList<>();
+        all.addAll(sentList); all.addAll(storedList); all.addAll(disregardedList);
+        for (message m : all) {
+            if (m.getMessageHash().equals(hash)) {
+                String msgText = m.getMessage();
+                sentList.remove(m); storedList.remove(m); disregardedList.remove(m);
+                return "Message: \"" + msgText + "\" successfully deleted.";
+            }
+        }
+        return "Message not found.";
+    }
+
+    public static String displayReport() {
+        String out = "";
+        for (message m : sentList) {
+            out += "Message Hash: " + m.getMessageHash() + "\n";
+            out += "Recipient: " + m.getRecipient() + "\n";
+            out += "Message: " + m.getMessage() + "\n\n";
+        }
+        return out;
+    }
+
+    public static String displayStoredSenderRecipient() {
+        String out = "";
+        for (message m : storedList) {
+            out += "Sender: Developer | Recipient: " + m.getRecipient() + "\n";
+        }
+        return out;
+    }
+
+    public static String getLongestStoredMessage() {
+        String longest = "";
+        for (message m : storedList) {
+            if (m.getMessage().length() > longest.length()) longest = m.getMessage();
+        }
+        return longest;
+    }
+
+    public static String searchStoredByID(String id) {
+        for (message m : storedList) {
+            if (m.getMessageID().equals(id)) return "Recipient: " + m.getRecipient() + "\nMessage: " + m.getMessage();
+        }
+        return "Not found.";
+    }
+
+    public static String displayFullStoredReport() {
+        String out = "";
+        for (message m : storedList) {
+            out += m.getFullDetails() + "\n\n";
+        }
+        return out;
+    }
 }

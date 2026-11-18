@@ -220,15 +220,16 @@ public class message {
     }
 
     public static String searchByRecipient(String recipient) {
-    String out = "";
-    for (int i = 0; i < messageCount; i++) {
-        if (recipientArray[i].equals(recipient)) {
-            out += messageArray[i] + ", ";
+        String out = "";
+        for (int i = 0; i < messageCount; i++) {
+            if (recipientArray[i].equals(recipient) && (flagArray[i].equals("Sent") || flagArray[i].equals("Stored"))) {
+                out += messageArray[i] + ", ";
+            }
         }
+        if (out.length() > 2) out = out.substring(0, out.length() - 2);
+        return out;
     }
-    if (out.length() > 2) out = out.substring(0, out.length() - 2);
-    return out;
-}
+
     public static String deleteByHash(String hash) {
         for (int i = 0; i < messageCount; i++) {
             if (hashArray[i].equals(hash)) {

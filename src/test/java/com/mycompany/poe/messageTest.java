@@ -78,7 +78,6 @@ public class messageTest {
         assertEquals(before, message.getTotalMessagesStatic());
     }
 
-    // --- PART 3 TESTS ---
     private message makeTestData() {
         message.clearAllLists();
         message.resetTotal();
@@ -90,10 +89,6 @@ public class messageTest {
         m3.SentMessage("2"); m3.recordMessage();
         message m4 = new message(4, "+27838884567", "It is dinner time!");
         m4.setMessageID("0838884567");
-        // Need to fix hash + arrays after changing ID - re-add correctly
-        // Remove last added entry for m4 and re-add with correct ID
-        // Simpler: set ID BEFORE record, so we fix by clearing and re-doing m4
-        // For this test we set ID before record by recreating:
         m4.SentMessage("1"); m4.recordMessage();
         message m5 = new message(5, "+27838884567", "Ok, I am leaving without you.");
         m5.SentMessage("3"); m5.recordMessage();
@@ -126,7 +121,7 @@ public class messageTest {
     @Test
     public void testSearchAllMessagesByRecipient() {
         makeTestData();
-        assertEquals("Where are you? You are late! I have asked you to be on time., Ok, I am leaving without you.", message.searchByRecipient("+27838884567"));
+      assertEquals("Where are you? You are late! I have asked you to be on time., It is dinner time!, Ok, I am leaving without you.", message.searchByRecipient("+27838884567"));
     }
 
     @Test

@@ -24,7 +24,7 @@ public class Poe {
         System.out.print("Enter Password: ");
         String pass = input.nextLine();
 
-        System.out.println(login.registerUser(user, pass, pass, first, last));
+        System.out.println(login.registerUser(user, pass, first, last));
 
         System.out.print("Login - Enter Username: ");
         String loginUser = input.nextLine();
@@ -58,7 +58,6 @@ public class Poe {
                 int limit = Integer.parseInt(input.nextLine());
 
                 for (int i = 0; i < limit; i++) {
-                    // Recipient with re-ask
                     String recipient = "";
                     while (true) {
                         System.out.print("Enter recipient (+27...): ");
@@ -68,7 +67,6 @@ public class Poe {
                         if (temp.isRecipientValid()) break;
                     }
 
-                    // Message text with re-ask
                     String text = "";
                     while (true) {
                         System.out.print("Enter message (max 250 chars): ");
@@ -101,6 +99,8 @@ public class Poe {
             if (mainChoice.equals("2")) {
                 System.out.println("Sent Messages: " + message.getSentMessages());
                 System.out.println("Longest: " + message.getLongestMessage());
+                System.out.println("--- Message Report ---");
+                System.out.println(message.displayReport());
             }
 
             if (mainChoice.equals("3")) {
@@ -110,7 +110,8 @@ public class Poe {
                 System.out.println("d. Search for all messages for a recipient");
                 System.out.println("e. Delete a message using hash");
                 System.out.println("f. Display report");
-                System.out.print("Choose a-f: ");
+                System.out.println("g. Display all stored messages from JSON file");
+                System.out.print("Choose a-g: ");
                 String c = input.nextLine().toLowerCase();
                 if (c.equals("a")) System.out.println(message.displayStoredSenderRecipient());
                 if (c.equals("b")) System.out.println(message.getLongestStoredMessage());
@@ -127,6 +128,7 @@ public class Poe {
                     System.out.println(message.deleteByHash(input.nextLine()));
                 }
                 if (c.equals("f")) System.out.println(message.displayFullStoredReport());
+                if (c.equals("g")) System.out.println(message.readStoredMessagesFromFile());
             }
         }
         input.close();
